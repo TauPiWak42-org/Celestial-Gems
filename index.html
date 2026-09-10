@@ -63,7 +63,8 @@
   #battleWrap{display:flex;gap:16px;align-items:flex-start;flex-wrap:nowrap;justify-content:center;position:relative;margin-top:26px;}
   #boardOuter{position:relative;}
   #boardCanvas{border-radius:18px;cursor:pointer;display:block;border:1px solid rgba(170,140,255,0.35);
-    box-shadow:0 0 60px rgba(120,70,255,0.3),0 14px 50px rgba(0,0,0,0.55), inset 0 0 60px rgba(0,0,0,0.55);}
+    box-shadow:0 0 60px rgba(120,70,255,0.3),0 14px 50px rgba(0,0,0,0.55), inset 0 0 60px rgba(0,0,0,0.55);
+    touch-action:manipulation;}
   #hoverTip{position:absolute;pointer-events:none;display:none;z-index:6;transform:translate(-50%,-130%);
     background:rgba(13,10,36,0.92);border:1px solid rgba(190,160,255,0.5);border-radius:10px;
     padding:4px 10px;font-size:12px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.6);}
@@ -152,7 +153,6 @@
   .keyTag{display:inline-block;border:1px solid rgba(255,255,255,0.35);border-radius:5px;padding:0 5px;
     font-size:10px;color:#d8ccff;margin-left:4px;}
   .devBtnBig{font-size:20px;padding:18px 26px;margin:8px;border-radius:18px;}
-  /* ---- обсерватория ---- */
   .obsTitle{font-size:16px;letter-spacing:2px;color:#e8e0ff;margin:0 0 10px;
     border-bottom:1px solid rgba(216,176,106,0.5);padding-bottom:6px;}
   .obsWrap{display:flex;gap:22px;align-items:flex-start;justify-content:center;flex-wrap:wrap;}
@@ -188,7 +188,6 @@
   .btnWrap{margin-top:auto;width:100%;}
   .obsBtn{width:100%;padding:6px 0;font-size:12px;border-radius:8px;}
   .hintDrag{font-size:12px;color:#a99fd8;margin-top:8px;text-align:center;}
-  /* ---- лавка ---- */
   .shopHead{display:flex;align-items:center;gap:16px;margin-bottom:14px;text-align:left;
     padding:10px 14px;border-radius:16px;
     background:linear-gradient(180deg,rgba(70,50,140,0.45),rgba(20,14,50,0.6));
@@ -228,15 +227,9 @@
   body.mob .spellRow{flex-wrap:wrap;justify-content:center;}
   body.mob .spellBtn{width:74px;height:72px;}
   body.mob .spellBtn .ic svg{width:36px;height:36px;}
-  body.mob .orbWrap{
-    position:absolute;
-    width:90px;
-    height:90px;
-    top:4px;
-    bottom:auto;
-  }
-  body.mob #hpOrbWrap{left:4px;}
-  body.mob #manaOrbWrap{right:4px;}
+  body.mob .orbWrap{width:90px;height:90px;bottom:auto;top:8px;}
+  body.mob #hpOrbWrap{left:8px;}
+  body.mob #manaOrbWrap{right:8px;}
   body.mob #shieldArc{width:100px;height:100px;inset:-5px;}
   body.mob #aegisRing{inset:-7px;}
   body.mob .bigOrb .num{font-size:12px;}
@@ -248,11 +241,33 @@
   body.mob .poolGrid{grid-template-columns:repeat(3,1fr);}
   body.mob .obsDeck{width:100%;}
   body.mob .obsPool{min-width:0;}
+  body.mob #boardOuter{max-width:calc(100vw - 8px);}
+  body.mob #boardCanvas{width:100%;height:auto;}
 </style>
 </head>
 <body>
 <div class="aurora"><i></i><i></i><i></i></div>
 <div id="flash"></div>
+
+<div class="orbWrap hidden" id="hpOrbWrap">
+  <svg id="shieldArc" viewBox="0 0 212 212" width="212" height="212"><circle id="shieldArcC" cx="106" cy="106" r="100" fill="none"
+    stroke="#bfe6ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="628.3" stroke-dashoffset="628.3"
+    style="filter:drop-shadow(0 0 6px rgba(160,220,255,0.9))"/></svg>
+  <div id="aegisRing"></div>
+  <div class="bigOrb" id="hpOrbBig">
+    <div class="fill" id="hpFillBig"></div>
+    <div class="shine"></div>
+    <div class="num" id="hpNumBig"></div>
+    <div class="orbSub" id="shieldNumBig"></div>
+  </div>
+</div>
+<div class="orbWrap hidden" id="manaOrbWrap">
+  <div class="bigOrb" id="manaOrbBig">
+    <div class="fill" id="manaFillBig"></div>
+    <div class="shine"></div>
+    <div class="num" id="manaNumBig"></div>
+  </div>
+</div>
 
 <div id="mapScreen" class="screen">
   <h1>✨ Небесные Самоцветы ✨</h1>
@@ -262,25 +277,6 @@
 <div id="tooltip"></div>
 
 <div id="gameScreen" class="screen hidden">
-  <div class="orbWrap" id="hpOrbWrap">
-    <svg id="shieldArc" viewBox="0 0 212 212" width="212" height="212"><circle id="shieldArcC" cx="106" cy="106" r="100" fill="none"
-      stroke="#bfe6ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="628.3" stroke-dashoffset="628.3"
-      style="filter:drop-shadow(0 0 6px rgba(160,220,255,0.9))"/></svg>
-    <div id="aegisRing"></div>
-    <div class="bigOrb" id="hpOrbBig">
-      <div class="fill" id="hpFillBig"></div>
-      <div class="shine"></div>
-      <div class="num" id="hpNumBig"></div>
-      <div class="orbSub" id="shieldNumBig"></div>
-    </div>
-  </div>
-  <div class="orbWrap" id="manaOrbWrap">
-    <div class="bigOrb" id="manaOrbBig">
-      <div class="fill" id="manaFillBig"></div>
-      <div class="shine"></div>
-      <div class="num" id="manaNumBig"></div>
-    </div>
-  </div>
   <div id="gameStage">
     <div id="battleHud"><button onclick="flee()">🕊️ Улететь</button><span id="devBox"></span></div>
     <div id="goldHud">💠 <span id="goldMap2">0</span></div>
@@ -362,7 +358,7 @@
     <div class="setRow"><span>🛠️ Режим разработчика</span><button id="tDev" onclick="toggleCfg('dev')"></button></div>
     <div class="setRow"><span>🌑 Начать всё заново</span><button onclick="wipe()" style="background:linear-gradient(180deg,#7a2540,#4a1226)">стереть</button></div>
     <p class="tag" style="text-align:center">Здесь, в башне, время замедляется…</p>
-    <p class="tag" style="text-align:center;margin-top:-4px">версия <span id="verTag">0.1.002</span></p>
+    <p class="tag" style="text-align:center;margin-top:-4px">версия <span id="verTag">0.1.003</span></p>
   </div>
 </div>
 
@@ -386,7 +382,7 @@ function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
 
-var APP_VERSION='0.1.002';
+var APP_VERSION='0.1.003';
 var DEF_CFG={sfx:true,particles:true,dev:false,device:'pc'};
 var cfg=Object.assign({},DEF_CFG);
 try{cfg=Object.assign(cfg,JSON.parse(lsGet('sg_cfg')||'{}'));}catch(e){}
@@ -411,7 +407,6 @@ var S=null;
 function saveState(){lsSet('sg_save',JSON.stringify(S));}
 function wipe(){if(confirm('Растворить всё в тумане и начать заново?')){lsDel('sg_save');loadState();saveState();showScreen('mapScreen');}}
 
-/* ================= ЗВУК ================= */
 var AC=null,bus=null;
 function ac(){
   if(!AC){var Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return null;AC=new Ctx();}
@@ -472,7 +467,6 @@ function flashScreen(color){
   f.style.transition='opacity 0.55s ease';f.style.opacity='0';
 }
 
-/* ================= КАМНИ ================= */
 var GEMDEF={
   green :{base:'#3ecf6e',light:'#d8ffe4',dark:'#11613a',glow:'#3dff8a',name:'Камень Жизни',desc:'лечит и растит макс. HP в бою'},
   red   :{base:'#e8556d',light:'#ffd6dd',dark:'#7e1a30',glow:'#ff5c7a',name:'Капельник',desc:'наполняет случайное зелье'},
@@ -513,7 +507,6 @@ function potionSVG(k,f){
     '</svg>';
 }
 
-/* ================= СПРАЙТЫ ================= */
 var SPRITES={},CURSED_SPRITE=null;
 function hexPathAt(ctx,x,y,R){
   ctx.beginPath();
@@ -580,7 +573,6 @@ function buildSprites(){
   CURSED_SPRITE=cv;
 }
 
-/* ================= ПОЛЕ ================= */
 var COLS=10,ROWS=10,CELL=54,PAD=12;
 var BW=PAD*2+COLS*CELL,BH=PAD*2+ROWS*CELL;
 var bcv=$('boardCanvas');bcv.width=BW;bcv.height=BH;
@@ -694,7 +686,6 @@ function dominantColor(){
   return best;
 }
 
-/* ================= ВРАГИ ================= */
 var ENEMIES=[
   {name:'Сумрачная Дымка',f:1,flavor:'Холодный туман сгущается над камнями…'},
   {name:'Штормовой Дух',f:0,flavor:'Вихрь хохочет, кружа облака…'},
@@ -759,7 +750,6 @@ var POTIONS={
 };
 var POTION_ORDER=['heal','mana','rage'];
 
-/* ============ ИКОНКИ ЗАКЛИНАНИЙ ============ */
 var ICONS={
   heal:'<svg viewBox="0 0 24 24" width="46" height="46"><path d="M12 21.5C6.5 16.5 2.5 12.8 2.5 8.9 2.5 5.9 4.9 3.5 7.8 3.5c1.7 0 3.2.8 4.2 2.2 1-1.4 2.5-2.2 4.2-2.2 2.9 0 5.3 2.4 5.3 5.4 0 3.9-4 7.6-9.5 12.6z" fill="#2fbf62" stroke="#0d5c31" stroke-width="1.2"/><path d="M12 19C7.5 14.8 4.5 11.8 4.5 8.9c0-1.9 1.5-3.4 3.3-3.4 1.2 0 2.3.6 3 1.6l1.2 1.7 1.2-1.7c.7-1 1.8-1.6 3-1.6 1.8 0 3.3 1.5 3.3 3.4 0 2.9-3 5.9-7.5 10.1z" fill="#68ff9b"/><path d="M11 7.5h2v3h3v2h-3v3h-2v-3H8v-2h3z" fill="#ffffff"/><circle cx="8.2" cy="7.2" r="1.1" fill="#eafff2" opacity="0.9"/></svg>',
   fire:'<svg viewBox="0 0 24 24" width="46" height="46"><path d="M12 1.5c1.2 4.2-4.5 6.3-4.5 11.3a4.9 4.9 0 0 0 9.8 0c0-2.2-1.1-3.8-2.2-5.4-.5 1.6-1.6 2.2-2.2 2.2.6-2.7-.4-6.3-.9-8.1z" fill="#e0501e" stroke="#7a2408" stroke-width="1.1"/><path d="M12 20.8a3.2 3.2 0 0 1-3.2-3.2c0-2.1 2.1-3.2 3.2-5.2 1.1 2 3.2 3.1 3.2 5.2a3.2 3.2 0 0 1-3.2 3.2z" fill="#ffd85e"/><path d="M12 18.6a1.5 1.5 0 0 1-1.5-1.5c0-1 .8-1.6 1.5-2.6.7 1 1.5 1.6 1.5 2.6a1.5 1.5 0 0 1-1.5 1.5z" fill="#fff6d0"/><circle cx="9.4" cy="9.5" r="1" fill="#ffe9c9" opacity="0.85"/></svg>',
@@ -1006,7 +996,6 @@ function curseRandomGem(){
   pluck(120,0.8,0.09);
 }
 
-/* ---------- ход врага ---------- */
 function enemyTurn(){
   if(!combat||combat.over)return;
   combat.turn++;
@@ -1022,7 +1011,6 @@ function enemyTurn(){
   }
   var heavy=(combat.turn%4===0);
   var dmg=Math.max(1,Math.round(e.dmg*(heavy?1.8:1)*(1-combat.cursePct/100)+rnd(-1,2)));
-  if(combat.cursePct>0){}
   combat.cursePct=0;combat.defPct=0;
   var rw=$('ringWrap');
   rw.classList.remove('lunge');void rw.offsetWidth;rw.classList.add('lunge');
@@ -1100,7 +1088,6 @@ function defeat(){
     '<button onclick="hideOverlay();showScreen(\'mapScreen\')">🕊️ Домой</button>');
 }
 
-/* ================= HUD ================= */
 function floatBoard(x,y,text,color){
   var el=document.createElement('div');
   el.className='float';el.textContent=text;
@@ -1481,7 +1468,6 @@ function lifeProc(){
   updateHUD();
 }
 
-/* ---------- клики ---------- */
 function boardPos(ev){
   var r=bcv.getBoundingClientRect();
   return {x:(ev.clientX-r.left)*bcv.width/r.width,y:(ev.clientY-r.top)*bcv.height/r.height};
@@ -1505,10 +1491,10 @@ bcv.addEventListener('mousemove',function(ev){
 });
 bcv.addEventListener('mouseleave',function(){hoverCells=[];$('hoverTip').style.display='none';});
 bcv.addEventListener('click',function(ev){
+  if(ev.detail>1)return;
   var now=Date.now();
-  if(now - lastClickTime < 100) return;
-  lastClickTime = now;
-  
+  if(now-lastClickTime<250)return;
+  lastClickTime=now;
   if(!combat||combat.over||busy)return;
   if(Date.now()<denyUntil)return;
   var p=boardPos(ev);
@@ -1533,7 +1519,6 @@ bcv.addEventListener('click',function(ev){
     return;
   }
   busy=true;hoverCells=[];$('hoverTip').style.display='none';
-  var now=Date.now();
   combo=(now<comboUntil)?combo+1:1;
   comboDurTotal=comboDur();
   comboUntil=now+comboDurTotal;
@@ -1600,7 +1585,6 @@ document.addEventListener('keydown',function(ev){
   if(cm[code]!==undefined&&S.loadout[cm[code]])castSpell(S.loadout[cm[code]]);
 });
 
-/* ================= РЕНДЕР ПОЛЯ ================= */
 function roundRect(ctx,x,y,w,h,r){
   ctx.beginPath();
   ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
@@ -1842,18 +1826,18 @@ function drawBoard(t){
       }});
     bctx.restore();
   }
-  if(lowMovesChains.length > 0 && !busy){
+  if(lowMovesChains.length>0&&!busy){
     bctx.save();
-    var pulse = 0.5 + 0.5 * Math.sin(t / 300);
-    bctx.strokeStyle = 'rgba(255, 240, 100, ' + (0.6 + 0.3 * pulse) + ')';
-    bctx.lineWidth = 3;
-    bctx.shadowColor = 'rgba(255, 220, 80, 0.8)';
-    bctx.shadowBlur = 8;
+    var pulse=0.5+0.5*Math.sin(t/300);
+    bctx.strokeStyle='rgba(255, 240, 100, '+(0.6+0.3*pulse)+')';
+    bctx.lineWidth=3;
+    bctx.shadowColor='rgba(255, 220, 80, 0.8)';
+    bctx.shadowBlur=8;
     lowMovesChains.forEach(function(chain){
       chain.forEach(function(g){
-        if(board[g.r] && board[g.r][g.c] === g){
+        if(board[g.r]&&board[g.r][g.c]===g){
           bctx.beginPath();
-          bctx.arc(g.x, g.y, CELL/2 - 2 + pulse * 2, 0, TAU);
+          bctx.arc(g.x,g.y,CELL/2-2+pulse*2,0,TAU);
           bctx.stroke();
         }
       });
@@ -1904,7 +1888,6 @@ function drawBoard(t){
   drawSpellFx(t);
 }
 
-/* ================= МОДЕЛИ ВРАГОВ ================= */
 var EPALETTE=[
   {a:'#9fb6c9',b:'#4a5a68',glow:'#cfe6ff'},
   {a:'#8fd8ff',b:'#2a5a98',glow:'#bfeaff'},
@@ -2075,7 +2058,6 @@ function drawEnemyModel(ctx,t){
   ctx.restore();
 }
 
-/* ================= КАРТА ================= */
 var mcv=$('mapCanvas'),mctx=mcv.getContext('2d');
 var MW=1600,MH=900;
 var stars=[],clouds=[],si,ci;
@@ -2416,7 +2398,6 @@ function showObservatory(){
   $('overlayBox').classList.add('wide');
 }
 
-/* ================= МАГАЗИН ================= */
 var INC_STEPS=[50,50,50,140,140,140,310,1210,1210,1210];
 function incAt(i){return i<INC_STEPS.length?INC_STEPS[i]:9230;}
 function priceFor(base,n){var p=base;for(var i=0;i<n;i++)p+=incAt(i);return p;}
@@ -2469,7 +2450,6 @@ function buyItem(i){
   pluck(587.33,0.8,0.09);renderShop();updateHUD();
 }
 
-/* ================= ЭКРАНЫ ================= */
 function fitGame(){
   var st=$('gameStage');
   var mob=isMob();
@@ -2484,6 +2464,9 @@ function showScreen(id){
   ['mapScreen','gameScreen','shopScreen','settingsScreen'].forEach(function(s){$(s).classList.add('hidden');});
   $(id).classList.remove('hidden');
   $('tooltip').style.display='none';
+  var inBattle=(id==='gameScreen');
+  $('hpOrbWrap').classList.toggle('hidden',!inBattle);
+  $('manaOrbWrap').classList.toggle('hidden',!inBattle);
   if(id==='gameScreen')fitGame();
   if(id==='mapScreen'&&S){
     if(S.pendingArtifact){
@@ -2532,7 +2515,6 @@ function maybeTutorial(){
     '<button onclick="hideOverlay()">🕊️ начать путешествие</button>');
 }
 
-/* ================= ИНИЦИАЛИЗАЦИЯ ================= */
 buildSprites();
 $('legendBox').innerHTML=legendHTML;
 loadState();
@@ -2543,7 +2525,6 @@ applyDevice();
 fitGame();
 maybeTutorial();
 
-/* ================= ЦИКЛ ================= */
 var PASS_IDS=['eye','bomber','burner','root','echo','reap','life'];
 var movesCheck=0;
 function tick(t){
