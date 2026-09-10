@@ -387,7 +387,7 @@ style="filter:drop-shadow(0 0 6px rgba(160,220,255,0.9))"/></svg>
 <div class="setRow"><span>🛠️ Режим разработчика</span><button id="tDev" onclick="toggleCfg('dev')"></button></div>
 <div class="setRow"><span>🌑 Начать всё заново</span><button onclick="wipe()" style="background:linear-gradient(180deg,#7a2540,#4a1226)">стереть</button></div>
 <p class="tag" style="text-align:center">Здесь, в башне, время замедляется…</p>
-<p class="tag" style="text-align:center;margin-top:-4px">версия <span id="verTag">0.1.006</span></p>
+<p class="tag" style="text-align:center;margin-top:-4px">версия <span id="verTag">0.1.008</span></p>
 </div>
 </div>
 <div id="overlay" class="hidden"><div class="panel" id="overlayBox"></div></div>
@@ -408,7 +408,7 @@ function lerp(a,b,k){return a+(b-a)*k;}
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
-var APP_VERSION='0.1.006';
+var APP_VERSION='0.1.008';
 var DEF_CFG={sfx:true,particles:true,dev:false,device:'pc',highlightChains:1};
 var cfg=Object.assign({},DEF_CFG);
 try{cfg=Object.assign(cfg,JSON.parse(lsGet('sg_cfg')||'{}'));}catch(e){}
@@ -498,12 +498,12 @@ f.style.transition='opacity 0.55s ease';f.style.opacity='0';
 }
 var GEMDEF={
 green :{base:'#3ecf6e',light:'#d8ffe4',dark:'#11613a',glow:'#3dff8a',name:'Камень Жизни',desc:'лечит и растит макс. HP в бою'},
-red :{base:'#e8556d',light:'#ffd6dd',dark:'#7e1a30',glow:'#ff5c7a',name:'Капельник',desc:'наполняет случайное зелье'},
+red   :{base:'#e8556d',light:'#ffd6dd',dark:'#7e1a30',glow:'#ff5c7a',name:'Капельник',desc:'наполняет случайное зелье'},
 orange:{base:'#f5953c',light:'#ffe9c9',dark:'#8a4a0d',glow:'#ff9f43',name:'Пламень',desc:'наносит урон врагу'},
-cyan :{base:'#4cc3f0',light:'#ddf9ff',dark:'#12608a',glow:'#59d8ff',name:'Эфир',desc:'возвращает ману'},
+cyan  :{base:'#4cc3f0',light:'#ddf9ff',dark:'#12608a',glow:'#59d8ff',name:'Эфир',desc:'возвращает ману'},
 white :{base:'#e8ecff',light:'#ffffff',dark:'#8f98c2',glow:'#ffffff',name:'Завеса',desc:'дарует щит (щедро)'},
 purple:{base:'#a06cf0',light:'#eeddff',dark:'#4e2a86',glow:'#b57bff',name:'Проклятие',desc:'−3% силы врага и −3% его защиты'},
-pink :{base:'#ff7ad9',light:'#ffe1f8',dark:'#94267a',glow:'#ff8ce0',name:'Гармония',desc:'редкий — всего понемногу'}
+pink  :{base:'#ff7ad9',light:'#ffe1f8',dark:'#94267a',glow:'#ff8ce0',name:'Гармония',desc:'редкий — всего понемногу'}
 };
 var COLOR_KEYS=Object.keys(GEMDEF);
 var COLOR_W=[1,1,1,1,1,0.95,0.16];
@@ -615,6 +615,7 @@ var ectx=ecv.getContext('2d');
 ectx.scale(DPR,DPR);
 var mcv=$('mapCanvas');
 mcv.width=1600*DPR;mcv.height=900*DPR;
+mcv.style.width='1600px';mcv.style.height='900px';
 var mctx=mcv.getContext('2d');
 mctx.scale(DPR,DPR);
 var board=[],particles=[],busy=false,hoverCells=[],denyUntil=0;
@@ -1130,9 +1131,9 @@ function floatBoard(x,y,text,color){
 var el=document.createElement('div');
 el.className='float';el.textContent=text;
 var rect=bcv.getBoundingClientRect();
-var k=rect.width/bcv.width;
-el.style.left=(x*k-32)+'px';
-el.style.top=(y*k-10)+'px';
+var k=rect.width/BW;
+el.style.left=(x*k-32*k)+'px';
+el.style.top=(y*k-10*k)+'px';
 el.style.color=color;
 $('boardOuter').appendChild(el);
 setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},1400);
@@ -1142,7 +1143,8 @@ var w=$('battleWrap');
 var d=document.createElement('div');
 d.className='float';d.textContent=text;d.style.color=color;
 var r=el.getBoundingClientRect(),wr=w.getBoundingClientRect();
-var sc=$('gameStage').getBoundingClientRect().width/(isMob()?600:1280)||1;
+var BASE_W=isMob()?600:1280;
+var sc=$('gameStage').getBoundingClientRect().width/BASE_W||1;
 d.style.left=((r.left-wr.left)/sc+r.width/sc/2-15)+'px';
 d.style.top=((r.top-wr.top)/sc+10)+'px';
 w.appendChild(d);
@@ -1160,8 +1162,9 @@ $('hpFillBig').style.height=(S.hp/S.maxHp*100)+'%';
 $('hpNumBig').textContent=Math.round(S.hp)+' / '+Math.round(S.maxHp);
 $('manaFillBig').style.height=(S.mana/S.maxMana*100)+'%';
 $('manaNumBig').textContent=Math.round(S.mana)+' / '+S.maxMana;
-$('shieldArcC').setAttribute('stroke-dashoffset',String(SHIELD_C*(1-clamp((combat?combat.shield:0)/Math.max(1,S.maxHp),0,1))));
-$('shieldNumBig').textContent=(combat&&combat.shield>0)?('🛡 '+combat.shield):'';
+var sh=combat?combat.shield:0;
+$('shieldArcC').setAttribute('stroke-dashoffset',String(SHIELD_C*(1-clamp(sh/Math.max(1,S.maxHp),0,1))));
+$('shieldNumBig').textContent=sh>0?('🛡 '+sh):'';
 $('aegisRing').style.display=(combat&&combat.aegis)?'block':'none';
 }
 $('vbarHpFill').style.height=(S.hp/S.maxHp*100)+'%';
@@ -1536,7 +1539,8 @@ updateHUD();
 }
 function boardPos(ev){
 var r=bcv.getBoundingClientRect();
-return {x:(ev.clientX-r.left)*bcv.width/r.width,y:(ev.clientY-r.top)*bcv.height/r.height};
+var k=BW/r.width;
+return {x:(ev.clientX-r.left)*k, y:(ev.clientY-r.top)*k};
 }
 bcv.addEventListener('mousemove',function(ev){
 var tip=$('hoverTip');
@@ -1657,8 +1661,9 @@ ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
 var boardBgCache=null;
 function buildBoardBgCache(){
 boardBgCache=document.createElement('canvas');
-boardBgCache.width=BW;boardBgCache.height=BH;
+boardBgCache.width=BW*DPR;boardBgCache.height=BH*DPR;
 var c=boardBgCache.getContext('2d');
+c.scale(DPR,DPR);
 var gr=c.createLinearGradient(0,0,0,BH);
 gr.addColorStop(0,'rgba(46,34,100,0.55)');gr.addColorStop(0.6,'rgba(20,15,52,0.6)');gr.addColorStop(1,'rgba(8,6,24,0.75)');
 c.fillStyle=gr;c.fillRect(0,0,BW,BH);
@@ -1673,7 +1678,7 @@ c.fillStyle=vg;c.fillRect(0,0,BW,BH);
 }
 function drawBoardBg(t){
 if(!boardBgCache)buildBoardBgCache();
-bctx.drawImage(boardBgCache,0,0);
+bctx.drawImage(boardBgCache,0,0,BW,BH);
 bctx.save();
 bctx.translate(BW/2,BH/2);bctx.rotate(t/9000);
 bctx.strokeStyle='rgba(190,160,255,0.08)';bctx.lineWidth=2;bctx.setLineDash([6,14]);
@@ -1881,6 +1886,7 @@ bctx.beginPath();bctx.arc(BW/2,BH/2,30+k*60,0,TAU);bctx.stroke();
 }
 bctx.restore();
 }
+var _cachedSortedGems=null;
 function drawBoard(t){
 bctx.clearRect(0,0,BW,BH);
 drawBoardBg(t);
@@ -1909,7 +1915,7 @@ bctx.lineWidth=3;
 if(!mob){bctx.shadowColor='rgba(255, 220, 80, 0.8)';bctx.shadowBlur=8;}
 lowMovesChains.forEach(function(chain){
 chain.forEach(function(g){
-if(board[g.r]&&board[g.r][c]===g){
+if(board[g.r]&&board[g.r][g.c]===g){
 bctx.beginPath();
 bctx.arc(g.x,g.y,CELL/2-2+pulse*2,0,TAU);
 bctx.stroke();
@@ -1927,15 +1933,16 @@ bctx.beginPath();bctx.arc(g.x,g.y,CELL/2-3+Math.sin(t/200)*1.5,0,TAU);bctx.strok
 bctx.restore();
 }
 var fb=1+0.05*Math.floor(S.wins/2);
-// [BUGFIX] Sort gems by current y to ensure proper z-order for falling gems
-var allGems=[];
+if(boardChanged||_cachedSortedGems===null){
+_cachedSortedGems=[];
 for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++){
 var g=board[r]&&board[r][c];
-if(g)allGems.push(g);
+if(g)_cachedSortedGems.push(g);
 }
-allGems.sort(function(a,b){return a.y-b.y;});
-for(var gi=0;gi<allGems.length;gi++){
-var g=allGems[gi];
+_cachedSortedGems.sort(function(a,b){return a.ty-b.ty;});
+}
+for(var gi=0;gi<_cachedSortedGems.length;gi++){
+var g=_cachedSortedGems[gi];
 if(g.y<g.ty-0.4){
 g.vy=Math.min(g.vy+0.6*fb,13*fb);g.y+=g.vy;
 if(g.y>=g.ty){g.y=g.ty;g.vy=0;g.scale=0.86;}
@@ -1998,8 +2005,9 @@ var enemyStaticCache={tier:-1,canvas:null};
 function buildEnemyStaticCache(tier){
 if(enemyStaticCache.tier===tier&&enemyStaticCache.canvas)return enemyStaticCache.canvas;
 var cv=document.createElement('canvas');
-cv.width=260;cv.height=210;
+cv.width=260*DPR;cv.height=210*DPR;
 var ctx=cv.getContext('2d');
+ctx.scale(DPR,DPR);
 var pal=EPALETTE[tier%EPALETTE.length];
 var cx=130,cy=105;
 var ag=ctx.createRadialGradient(cx,cy,4,cx,cy,62+tier*4);
@@ -2028,7 +2036,7 @@ var frozen=combat.freezeUntil>now;
 ctx.save();
 if(stunned){ctx.translate(cx,cy);ctx.rotate(Math.sin(t/110)*0.1);ctx.translate(-cx,-cy);}
 var staticCv=buildEnemyStaticCache(tier);
-ctx.drawImage(staticCv,0,0);
+ctx.drawImage(staticCv,0,0,W,H);
 if(tier>=7){
 ctx.strokeStyle=hexA(pal.glow,0.35);ctx.lineWidth=1.5;ctx.setLineDash([4,8]);
 ctx.beginPath();ctx.arc(cx,cy,54,t/800,t/800+TAU);ctx.stroke();
@@ -2336,7 +2344,7 @@ mctx.save();
 mctx.font='19px Georgia';mctx.textAlign='center';
 mctx.fillStyle='rgba(225,215,255,0.85)';
 mctx.shadowColor='#000000';mctx.shadowBlur=6;
-mctx.fillText('💠 '+S.gold+' ❤️ '+Math.round(S.hp)+'/'+S.maxHp+' 🌀 '+Math.round(S.mana)+'/'+S.maxMana+' ⚔️ побед: '+S.wins,MW/2,MH-20);
+mctx.fillText('💠 '+S.gold+'    ❤️ '+Math.round(S.hp)+'/'+S.maxHp+'    🌀 '+Math.round(S.mana)+'/'+S.maxMana+'    ⚔️ побед: '+S.wins,MW/2,MH-20);
 mctx.restore();
 }
 function mapPos(ev){
@@ -2621,13 +2629,17 @@ if(mob&&now-lastFrameTime<33)return;
 lastFrameTime=now;
 var overlayVisible=!$('overlay').classList.contains('hidden');
 try{
-if(!overlayVisible&&!$('mapScreen').classList.contains('hidden'))drawMap(t);
-if(!overlayVisible&&!$('gameScreen').classList.contains('hidden')&&board.length){
+var mapVisible=!$('mapScreen').classList.contains('hidden');
+var gameVisible=!$('gameScreen').classList.contains('hidden');
+if(mapVisible&&!overlayVisible)drawMap(t);
+if(gameVisible&&board.length){
+if(!overlayVisible){
 drawBoard(t);
 drawEnemyModel(ectx,t);
 updateAtkBar();
 updateComboUI();
 updateSpellCd();
+}
 if(combat&&!combat.over){
 if(now>movesCheck){movesCheck=now+600;if(!busy)ensureMoves();}
 if(boardChanged&&!busy){
@@ -2774,5 +2786,3 @@ window.addEventListener('beforeunload',saveState);
 </script>
 </body>
 </html>
-
-
